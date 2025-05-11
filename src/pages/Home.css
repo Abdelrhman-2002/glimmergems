@@ -1,0 +1,311 @@
+/* src/pages/HomePage.css */
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  color: #1c1c1c;
+  line-height: 1.7;
+  background-color: #fefefe;
+}
+
+/* Typography - refined for luxury feel */
+h1, h2, h3, h4, h5 {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+}
+
+h2 {
+  font-size: 2.8rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 30%;
+  height: 1px;
+  background: linear-gradient(to right, #d4af37, transparent);
+}
+
+.section-title-centered h2:after {
+  left: 35%;
+  width: 30%;
+}
+
+h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+
+/* Layout containers */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Hero carousel */
+.carousel-container {
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel,
+.carousel-inner,
+.carousel-item {
+  height: 75vh;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* FEATURED SECTION - REFINED TYPOGRAPHY AND REDUCED ANIMATIONS */
+.featured-section {
+  padding: 7rem 0;
+  position: relative;
+  background-color: #fbfbfb;
+  border-top: 1px solid #f2f2f2;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+/* Elegant section header with improved typography */
+.section-header {
+  text-align: center;
+  margin-bottom: 5rem;
+  padding: 0 1rem;
+}
+
+.section-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem;
+  color: #1c1c1c;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.section-description {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+/* Simple, elegant divider */
+.divider {
+  width: 60px;
+  height: 1px;
+  background-color: #d4af37;
+  margin: 2rem auto;
+}
+
+/* Featured products grid */
+.featured-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2.5rem;
+  margin-top: 1rem;
+}
+
+.featured-item {
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featured-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.item-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 300px;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.featured-item:hover .item-image {
+  transform: scale(1.03);
+}
+
+.item-details {
+  padding: 1.8rem;
+  text-align: center;
+}
+
+.item-category {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #999;
+  margin-bottom: 0.5rem;
+}
+
+.item-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.item-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  color: #d4af37;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+/* Elegant view-all button */
+.view-all-container {
+  text-align: center;
+  margin-top: 5rem;
+}
+
+.btn-view-all {
+  font-family: 'Montserrat', sans-serif;
+  background-color: transparent;
+  border: 1px solid #d4af37;
+  color: #333;
+  padding: 12px 35px;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-view-all:hover {
+  background-color: #d4af37;
+  color: white;
+}
+
+/* Media queries */
+@media (max-width: 1200px) {
+  .carousel, .carousel-inner, .carousel-item {
+    height: 70vh;
+  }
+  
+  .section-title {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .featured-section {
+    padding: 6rem 0;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+  
+  .section-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel, .carousel-inner, .carousel-item {
+    height: 60vh;
+  }
+  
+  .featured-section {
+    padding: 5rem 0;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .section-header {
+    margin-bottom: 4rem;
+  }
+  
+  .item-image-container {
+    height: 250px;
+  }
+  
+  .featured-items {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel, .carousel-inner, .carousel-item {
+    height: 50vh;
+  }
+  
+  .featured-section {
+    padding: 4rem 0;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+  
+  .section-description {
+    font-size: 0.9rem;
+  }
+  
+  .featured-items {
+    gap: 1.5rem;
+  }
+  
+  .view-all-container {
+    margin-top: 3.5rem;
+  }
+}

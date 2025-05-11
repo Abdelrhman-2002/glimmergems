@@ -1,0 +1,284 @@
+/* Reset styles for full width layout */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Main app container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Make main content expand to fill available space */
+main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+/* Ensure navbar spans full width */
+.navbar {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Make navbar container full width */
+.navbar > .container,
+.navbar > .container-fluid {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Make all containers respect parent width */
+.container,
+.container-fluid {
+  width: 100%;
+}
+
+/* Ensure footer spans full width */
+footer {
+  width: 100%;
+}
+
+/* Product card styles remain the same */
+.product-card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Other existing styles... */
+/* General Styles */
+body {
+  font-family: 'Raleway', sans-serif;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #c0a080 !important;
+}
+
+/* Product Card */
+.product-card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.product-price {
+  font-weight: 600;
+  color: #c0a080;
+  font-size: 1.1rem;
+}
+
+/* Category Card */
+.category-card {
+  position: relative;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.05);
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.category-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Product Detail Page */
+.product-detail-img {
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  object-fit: contain;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: #c0a080;
+  border-color: #c0a080;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #a88c6d !important;
+  border-color: #a88c6d !important;
+}
+
+.btn-outline-primary {
+  color: #c0a080;
+  border-color: #c0a080;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: #c0a080 !important;
+  border-color: #c0a080 !important;
+  color: white !important;
+}
+
+/* Social Icons */
+.social-icons a {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  line-height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.social-icons a:hover {
+  background-color: #c0a080;
+}
+
+/* Cart Item */
+.cart-item-img {
+  max-width: 80px;
+  border-radius: 4px;
+}
+.carousel {
+  height: 500px;
+}
+
+.carousel-item {
+  height: 500px;
+}
+/*  */
+
+/* Add these styles to completely remove any gaps */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Force navbar to have zero bottom margin */
+.navbar, .navbar-dark, .bg-dark {
+  margin: 0 !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+/* Force carousel to have zero top margin/padding */
+.carousel, .carousel-inner {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-top: none !important;
+}
+
+/* The magic fix - this creates a negative margin stronger than any gap */
+.carousel-container {
+  margin-top: -24px !important; /* Increase this value if needed */
+  display: block !important;
+}
+
+/* Fix for potential Bootstrap container margins */
+.container, .container-fluid, main, .row, .col {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+/* Fixed navbar styles */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030; /* High z-index to stay on top */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds a subtle shadow */
+}
+
+/* Add padding to the body to prevent content from hiding behind navbar */
+body {
+  padding-top: 56px; /* Adjust this value to match your navbar height */
+}
+
+/* Adjust for taller navbars on larger screens */
+@media (min-width: 992px) {
+  body {
+    padding-top: 60px; /* Slightly taller on desktop */
+  }
+}
+
+/* Fix carousel to work with fixed navbar */
+.carousel-container {
+  margin-top: 0; /* Remove any negative margin */
+  padding-top: 0;
+}
