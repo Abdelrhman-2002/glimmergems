@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Configure API base URL - this should point to your XAMPP PHP backend
-const API_URL = 'http://localhost/backend/jewerly_api/api';  
+// Add CORS proxy to your API URL
+const API_URL = 'https://api.allorigins.win/raw?url=https://jewerly-api.rf.gd/api';
 
-// Create axios instance
+// Rest of your code remains the same
 const api = axios.create({
   baseURL: API_URL,
   headers: {
