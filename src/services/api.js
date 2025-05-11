@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Add CORS proxy to your API URL
-const API_URL = 'https://api.allorigins.win/raw?url=https://jewerly-api.rf.gd/api';
+const API_URL = 'https://corsproxy.io/?https://jewerly-api.rf.gd/api';
 
 // Rest of your code remains the same
 const api = axios.create({
