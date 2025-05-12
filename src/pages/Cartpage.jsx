@@ -13,6 +13,11 @@ const CartPage = () => {
   const shipping = subtotal > 100 ? 0 : 10;
   const total = subtotal + shipping;
 
+  // Format price to show EGP currency
+  const formatPrice = (price) => {
+    return `${parseFloat(price).toLocaleString('en-EG')} EGP`;
+  };
+
   if (cartItems.length === 0) {
     return (
       <Container className="py-5">
@@ -32,7 +37,7 @@ const CartPage = () => {
           <Card className="mb-4">
             <Card.Body>
               {cartItems.map(item => (
-                <CartItem key={item.product_id} item={item} />
+                <CartItem key={item._id} item={item} />
               ))}
               <div className="d-flex justify-content-between mt-3">
                 <Button variant="outline-danger" onClick={clearCart}>
@@ -56,21 +61,21 @@ const CartPage = () => {
             <Card.Body>
               <div className="d-flex justify-content-between mb-3">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="d-flex justify-content-between mb-3">
                 <span>Shipping:</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
               </div>
               {shipping === 0 && (
                 <Alert variant="success" className="py-2">
-                  <small>Free shipping on orders over $100!</small>
+                  <small>Free shipping on orders over 100 EGP!</small>
                 </Alert>
               )}
               <hr />
               <div className="d-flex justify-content-between mb-4">
                 <strong>Total:</strong>
-                <strong>${total.toFixed(2)}</strong>
+                <strong>{formatPrice(total)}</strong>
               </div>
               <Link to="/checkout">
                 <Button variant="primary" className="w-100">

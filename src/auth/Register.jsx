@@ -5,8 +5,8 @@ import { AuthContext } from '../contexts/Authcontext';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirm_password: ''
@@ -67,12 +67,12 @@ const RegisterPage = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                    <Form.Group className="mb-3" controlId="first_name">
+                    <Form.Group className="mb-3" controlId="firstName">
                       <Form.Label>First Name</Form.Label>
                       <Form.Control 
                         type="text" 
-                        name="first_name"
-                        value={formData.first_name} 
+                        name="firstName"
+                        value={formData.firstName} 
                         onChange={handleChange}
                         placeholder="Enter your first name"
                         required
@@ -80,12 +80,12 @@ const RegisterPage = () => {
                     </Form.Group>
                   </Col>
                   <Col md={6}>
-                    <Form.Group className="mb-3" controlId="last_name">
+                    <Form.Group className="mb-3" controlId="lastName">
                       <Form.Label>Last Name</Form.Label>
                       <Form.Control 
                         type="text" 
-                        name="last_name"
-                        value={formData.last_name} 
+                        name="lastName"
+                        value={formData.lastName} 
                         onChange={handleChange}
                         placeholder="Enter your last name"
                         required

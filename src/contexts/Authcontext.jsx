@@ -39,19 +39,21 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (email, password) => {
     setError(null);
     try {
-      const data = await login(email, password);
+      const response = await login(email, password);
       
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setCurrentUser(data.user);
+      if (response.success && response.user) {
+        const userData = response.user;
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setCurrentUser(userData);
         return true;
       } else {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(response.message || 'Login failed');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during login');
-      return false;
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || err.message || 'An error occurred during login');
+      throw err;
     }
   };
 
@@ -59,19 +61,21 @@ export const AuthProvider = ({ children }) => {
   const handleRegister = async (userData) => {
     setError(null);
     try {
-      const data = await register(userData);
+      const response = await register(userData);
       
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setCurrentUser(data.user);
+      if (response.success && response.user) {
+        const userInfo = response.user;
+        localStorage.setItem('token', userInfo.token);
+        localStorage.setItem('user', JSON.stringify(userInfo));
+        setCurrentUser(userInfo);
         return true;
       } else {
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(response.message || 'Registration failed');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during registration');
-      return false;
+      console.error('Registration error:', err);
+      setError(err.response?.data?.message || err.message || 'An error occurred during registration');
+      throw err;
     }
   };
 

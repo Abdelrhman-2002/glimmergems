@@ -12,6 +12,11 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 // Load Stripe with the correct publishable key
 const stripePromise = loadStripe('pk_test_51RNZ9MGghYFFzNF3Z7aFmRbbOoxRtxu2wCGXXKFeWc6SEqSLXiVigS33l3xW5kOrfKUIp9xmuRXexEh1S9EyE0t500vks3GYPM');
 
+// Format price to show EGP currency
+const formatPrice = (price) => {
+  return `${parseFloat(price).toLocaleString('en-EG')} EGP`;
+};
+
 // Payment Form Component (separate component)
 const PaymentForm = ({ totalAmount, onPaymentComplete, onPaymentError }) => {
   const stripe = useStripe();
@@ -116,7 +121,7 @@ const PaymentForm = ({ totalAmount, onPaymentComplete, onPaymentError }) => {
         className="mt-3 w-100"
         disabled={!stripe || loading || paymentProcessed}
       >
-        {loading ? 'Processing...' : `Complete Order • $${totalAmount.toFixed(2)}`}
+        {loading ? 'Processing...' : `Complete Order • ${formatPrice(totalAmount)}`}
         <FontAwesomeIcon icon={faCreditCard} className="ms-2" />
       </Button>
     </Form>
@@ -148,8 +153,9 @@ const CheckoutPage = () => {
   const [orderCreated, setOrderCreated] = useState(false);
   
   const subtotal = getCartTotal();
-  const shipping = subtotal > 100 ? 0 : 10;
-  const taxRate = 0.07; // 7% tax rate
+  // Update shipping threshold to 7,500 EGP (approximately $100 in EGP)
+  const shipping = subtotal > 7500 ? 0 : 750;
+  const taxRate = 0.01; // 1% tax
   const tax = subtotal * taxRate;
   const total = subtotal + shipping + tax;
   
@@ -481,7 +487,7 @@ const CheckoutPage = () => {
                     <span>
                       {item.name} <span className="text-muted">x {item.quantity}</span>
                     </span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>{formatPrice(item.price * item.quantity)}</span>
                   </div>
                 ))}
               </div>
@@ -491,7 +497,7 @@ const CheckoutPage = () => {
               {/* Order Totals */}
               <div className="d-flex justify-content-between mb-2">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="d-flex justify-content-between mb-2">
                 <span>Shipping:</span>
@@ -499,27 +505,27 @@ const CheckoutPage = () => {
                   {shipping === 0 ? (
                     <span className="text-success">Free</span>
                   ) : (
-                    `$${shipping.toFixed(2)}`
+                    formatPrice(shipping)
                   )}
                 </span>
               </div>
               <div className="d-flex justify-content-between mb-2">
-                <span>Tax (7%):</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>Tax (1%):</span>
+                <span>{formatPrice(tax)}</span>
               </div>
               
               <hr />
               
               <div className="d-flex justify-content-between mb-0">
                 <strong>Total:</strong>
-                <strong>${total.toFixed(2)}</strong>
+                <strong>{formatPrice(total)}</strong>
               </div>
               
               {shipping === 0 && (
                 <Alert variant="success" className="mt-3 py-2">
                   <small className="mb-0">
                     <i className="fas fa-check-circle me-1"></i>
-                    Free shipping applied! Orders over $100 qualify for free shipping.
+                    Free shipping applied! Orders over 7,500 EGP qualify for free shipping.
                   </small>
                 </Alert>
               )}

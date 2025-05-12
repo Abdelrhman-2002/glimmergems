@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Add CORS proxy to your API URL
-const API_URL = 'https://corsproxy.io/?https://jewerly-api.rf.gd/api';
+// Use the Node.js backend URL
+const API_URL = 'http://localhost:3001/api';
 
-// Rest of your code remains the same
+// Create axios instance with the backend URL
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -26,9 +26,31 @@ api.interceptors.request.use(
 );
 
 // Product API functions
-export const getProducts = async (categoryId = null) => {
+export const getProducts = async (categoryId = null, minPrice = null, maxPrice = null, search = null) => {
   try {
-    const url = categoryId ? `/products/read.php?category_id=${categoryId}` : '/products/read.php';
+    // Start with base URL
+    let url = '/products';
+    
+    // Add query parameters
+    const params = new URLSearchParams();
+    
+    if (categoryId) params.append('category', categoryId);
+    if (minPrice) params.append('min_price', minPrice);
+    if (maxPrice) params.append('max_price', maxPrice);
+    
+    // Make sure search parameter is properly handled
+    if (search && search.trim()) {
+      params.append('search', search.trim());
+      console.log('API service: Adding search param:', search.trim());
+    }
+    
+    // Append params to URL if any exist
+    if (params.toString()) {
+      url = `${url}?${params.toString()}`;
+    }
+    
+    console.log('API Request URL:', url);
+    
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -39,7 +61,7 @@ export const getProducts = async (categoryId = null) => {
 
 export const getProduct = async (id) => {
   try {
-    const response = await api.get(`/products/read_one.php?id=${id}`);
+    const response = await api.get(`/products/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching product details:', error);
@@ -50,7 +72,7 @@ export const getProduct = async (id) => {
 // Category API functions
 export const getCategories = async () => {
   try {
-    const response = await api.get('/categories/read.php');
+    const response = await api.get('/categories');
     return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -61,20 +83,32 @@ export const getCategories = async () => {
 // Auth API functions
 export const login = async (email, password) => {
   try {
-    const response = await api.post('/users/login.php', { email, password });
+    const response = await api.post('/users/login', { email, password });
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
+    if (error.response && error.response.data) {
+      throw { 
+        message: error.response.data.message || 'Login failed',
+        response: error.response
+      };
+    }
     throw error;
   }
 };
 
 export const register = async (userData) => {
   try {
-    const response = await api.post('/users/register.php', userData);
+    const response = await api.post('/users/register', userData);
     return response.data;
   } catch (error) {
     console.error('Registration error:', error);
+    if (error.response && error.response.data) {
+      throw { 
+        message: error.response.data.message || 'Registration failed',
+        response: error.response
+      };
+    }
     throw error;
   }
 };
@@ -82,7 +116,7 @@ export const register = async (userData) => {
 // Stripe payment functions
 export const createPaymentIntent = async (amount) => {
   try {
-    const response = await api.post('/payments/create_intent.php', { amount });
+    const response = await api.post('/payments/create-intent', { amount });
     return response.data;
   } catch (error) {
     console.error('Error creating payment intent:', error);
@@ -92,8 +126,8 @@ export const createPaymentIntent = async (amount) => {
 
 export const confirmPayment = async (paymentIntentId) => {
   try {
-    const response = await api.post('/payments/confirm_payment.php', {
-      payment_intent_id: paymentIntentId
+    const response = await api.post('/payments/confirm', {
+      paymentIntentId
     });
     return response.data;
   } catch (error) {
@@ -105,10 +139,31 @@ export const confirmPayment = async (paymentIntentId) => {
 // Order functions
 export const createOrder = async (orderData) => {
   try {
-    const response = await api.post('/orders/create.php', orderData);
+    const response = await api.post('/orders', orderData);
     return response.data;
   } catch (error) {
     console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
+// Order functions - add these to your api.js file
+export const getUserOrders = async () => {
+  try {
+    const response = await api.get('/orders/myorders');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    throw error;
+  }
+};
+
+export const getOrderDetails = async (orderId) => {
+  try {
+    const response = await api.get(`/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order details:', error);
     throw error;
   }
 };

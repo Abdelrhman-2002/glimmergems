@@ -1,14 +1,17 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Image, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faShoppingCart, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { getProduct } from '../services/api';
 import { CartContext } from '../contexts/Cartcontext';
+import { AuthContext } from '../contexts/Authcontext';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
-  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
+  const { addToCart, errorMessage, setErrorMessage } = useContext(CartContext);
+  const { currentUser } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -19,8 +22,8 @@ const ProductDetailPage = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const data = await getProduct(id);
-        setProduct(data);
+        const response = await getProduct(id);
+        setProduct(response.product);
         setLoading(false);
       } catch (error) {
         setError('Failed to load product. Please try again later.');
@@ -32,9 +35,15 @@ const ProductDetailPage = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 3000);
+    const success = addToCart(product, quantity);
+    if (success) {
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 3000);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/login', { state: { returnUrl: `/product/${id}` } });
   };
 
   if (loading) {
@@ -68,6 +77,11 @@ const ProductDetailPage = () => {
     );
   }
 
+  // Format price to show EGP currency
+  const formatPrice = (price) => {
+    return `${parseFloat(price).toLocaleString('en-EG')} EGP`;
+  };
+
   return (
     <Container className="py-5">
       {addedToCart && (
@@ -76,10 +90,16 @@ const ProductDetailPage = () => {
         </Alert>
       )}
       
+      {errorMessage && (
+        <Alert variant="warning" dismissible onClose={() => setErrorMessage(null)}>
+          {errorMessage}
+        </Alert>
+      )}
+      
       <Row>
         <Col md={6} className="mb-4">
           <Image 
-            src={product.image_url || 'https://via.placeholder.com/500x500?text=Jewelry'} 
+            src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/500x500?text=Jewelry'} 
             alt={product.name} 
             fluid 
             className="product-detail-img" 
@@ -87,13 +107,10 @@ const ProductDetailPage = () => {
         </Col>
         <Col md={6}>
           <h1 className="mb-3">{product.name}</h1>
-          <p className="product-price h3 text-primary mb-4">${parseFloat(product.price).toFixed(2)}</p>
+          <p className="product-price h3 text-primary mb-4">{formatPrice(product.price)}</p>
           
           <div className="mb-4">
-            <p className="mb-2">Category: <span className="fw-bold">{product.category_name}</span></p>
-            {product.material && <p className="mb-2">Material: <span className="fw-bold">{product.material}</span></p>}
-            {product.stone_type && <p className="mb-2">Stone Type: <span className="fw-bold">{product.stone_type}</span></p>}
-            {product.weight && <p className="mb-2">Weight: <span className="fw-bold">{product.weight} g</span></p>}
+            <p className="mb-2">Category: <span className="fw-bold">{product.category?.name || 'Jewelry'}</span></p>
           </div>
           
           <p className="mb-4">{product.description}</p>
@@ -113,19 +130,31 @@ const ProductDetailPage = () => {
           
           <p className="mb-4">
             <FontAwesomeIcon icon={faCheckCircle} className="text-success me-2" />
-            {parseInt(product.stock) > 0 ? 'In Stock' : 'Out of Stock'}
+            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
           </p>
           
-          <Button 
-            variant="primary" 
-            size="lg" 
-            className="w-100" 
-            onClick={handleAddToCart}
-            disabled={parseInt(product.stock) <= 0}
-          >
-            <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
-            Add to Cart
-          </Button>
+          {currentUser ? (
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="w-100" 
+              onClick={handleAddToCart}
+              disabled={product.stock <= 0}
+            >
+              <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
+              Add to Cart
+            </Button>
+          ) : (
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="w-100" 
+              onClick={handleLoginRedirect}
+            >
+              <FontAwesomeIcon icon={faSignInAlt} className="me-2" />
+              Log In to Add to Cart
+            </Button>
+          )}
         </Col>
       </Row>
     </Container>

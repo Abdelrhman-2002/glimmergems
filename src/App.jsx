@@ -15,6 +15,16 @@ import ProfilePage from './pages/Profilepage';
 import OrdersPage from './pages/Ordpage';
 import OrderDetailPage from './pages/OrderDetailPage';
 
+// Import Admin Components
+import AdminLogin from './components/admin/AdminLogin';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
+import ProductManagement from './components/admin/ProductManagement';
+import OrderManagement from './components/admin/OrderManagement';
+import CategoryManagement from './components/admin/CategoryManagement';
+import CustomerManagement from './components/admin/CustomerManagement';
+import { AdminProtectedRoute } from './components/admin/AdminLayout';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -23,9 +33,15 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
-          <Navbar />
+          {/* Render Navbar only for non-admin routes */}
+          <Routes>
+            <Route path="/admin/*" element={null} />
+            <Route path="*" element={<Navbar />} />
+          </Routes>
+          
           <main>
             <Routes>
+              {/* Customer-facing routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
@@ -34,13 +50,32 @@ function App() {
               <Route path="/order-success" element={<OrderSuccessPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-               <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/order/:orderId" element={<OrderDetailPage />} />
-
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/order/:orderId" element={<OrderDetailPage />} />
+              
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={
+                <AdminProtectedRoute>
+                  <AdminLayout />
+                </AdminProtectedRoute>
+              }>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="products" element={<ProductManagement />} />
+                <Route path="categories" element={<CategoryManagement />} />
+                <Route path="orders" element={<OrderManagement />} />
+                <Route path="customers" element={<CustomerManagement />} />
+                <Route path="" element={<AdminDashboard />} />
+              </Route>
             </Routes>
           </main>
-          <Footer />
+          
+          {/* Render Footer only for non-admin routes */}
+          <Routes>
+            <Route path="/admin/*" element={null} />
+            <Route path="*" element={<Footer />} />
+          </Routes>
         </Router>
       </CartProvider>
     </AuthProvider>

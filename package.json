@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "cd backend && npm run dev",
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -18,8 +20,10 @@
     "@stripe/stripe-js": "^7.3.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
+    "chart.js": "^4.4.9",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.9",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.0",
     "react-fontawesome": "^1.7.1",
     "react-router-dom": "^7.6.0"
@@ -29,6 +33,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^8.2.2",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",

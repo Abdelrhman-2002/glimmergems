@@ -9,13 +9,18 @@ import './Home.css';
 
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
+  const [featuredCategory, setFeaturedCategory] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
-        if (response.records) {
-          setCategories(response.records);
+        if (response.categories) {
+          setCategories(response.categories);
+          // Set the first category as the featured one for the carousel
+          if (response.categories.length > 0) {
+            setFeaturedCategory(response.categories[0]);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -66,9 +71,11 @@ const HomePage = () => {
             <Carousel.Caption>
               <h1>Special Offers</h1>
               <p>Get 20% off on selected diamond rings</p>
-              <Link to="/products?category=1">
-                <Button variant="primary" size="lg">Shop Rings</Button>
-              </Link>
+              {featuredCategory && (
+                <Link to={`/products?category=${featuredCategory._id}`}>
+                  <Button variant="primary" size="lg">Shop {featuredCategory.name}</Button>
+                </Link>
+              )}
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
@@ -86,11 +93,11 @@ const HomePage = () => {
           <h2 className="text-center mb-4">Shop by Category</h2>
           <Row>
             {categories.map(category => (
-              <Col key={category.category_id} md={3} className="mb-4">
-                <Link to={`/products?category=${category.category_id}`} className="text-decoration-none">
+              <Col key={category._id} md={3} className="mb-4">
+                <Link to={`/products?category=${category._id}`} className="text-decoration-none">
                   <div className="category-card">
                     <img 
-                      src={category.image_url || `https://via.placeholder.com/300x200?text=${category.name}`}
+                      src={category.image || `https://via.placeholder.com/300x200?text=${category.name}`}
                       alt={category.name}
                       className="img-fluid rounded" 
                     />

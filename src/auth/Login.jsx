@@ -13,8 +13,9 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get redirect path from URL query parameter or default to home page
-  const from = location.state?.from?.pathname || '/';
+  // Get redirect path from either location state returnUrl or from path
+  const returnUrl = location.state?.returnUrl;
+  const from = returnUrl || location.state?.from?.pathname || '/';
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,8 +31,8 @@ const LoginPage = () => {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
-      console.error(err);
+      setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
@@ -47,6 +48,12 @@ const LoginPage = () => {
             </Card.Header>
             <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
+              
+              {returnUrl && (
+                <Alert variant="info">
+                  Please log in to add products to your cart
+                </Alert>
+              )}
               
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="email">

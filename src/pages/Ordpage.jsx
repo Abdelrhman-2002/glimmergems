@@ -2,17 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Table, Badge, Button, Alert, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/Authcontext';
-import axios from 'axios';
 
 const OrdersPage = () => {
-  // Use the useAuth hook to access currentUser
   const { currentUser } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [debugInfo, setDebugInfo] = useState(null);
 
-  // Fetch orders when component mounts
   useEffect(() => {
     const fetchOrders = async () => {
       if (!currentUser) {
@@ -23,46 +20,36 @@ const OrdersPage = () => {
       try {
         console.log("Fetching orders for user:", currentUser);
         
-        // Get token from localStorage for authorization
-        const token = localStorage.getItem('token');
-        console.log("Token available:", !!token);
-        
-        // API endpoint URL - make sure this matches your actual backend path
-        const apiUrl = 'http://localhost/backend/jewerly_api/api/orders/read_by_user.php';
+        // API endpoint URL - direct to localhost with user_id
+        const apiUrl = `http://localhost/backend/jewerly_api/api/orders/read_by_user.php?user_id=${currentUser.user_id}`;
         console.log("API URL:", apiUrl);
         
-        // Make API request to get user's orders
-        const response = await axios.get(apiUrl, {
-          params: { user_id: currentUser.user_id },
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        console.log('Orders API full response:', response);
+        // Make API request
+        const response = await fetch(apiUrl);
         
-        if (response.data.success) {
-          console.log('Orders retrieved:', response.data.orders);
-          setOrders(response.data.orders || []);
+        // Get response as text first for debugging
+        const rawText = await response.text();
+        console.log("Raw API response:", rawText);
+        
+        // Parse the JSON
+        const data = JSON.parse(rawText);
+        console.log("Parsed data:", data);
+        
+        if (data.success) {
+          console.log("Orders retrieved:", data.orders);
+          // Set the orders state with the array from response
+          setOrders(data.orders || []);
         } else {
-          console.error('API returned error:', response.data.message);
-          setError(response.data.message || 'Failed to fetch orders');
-          setDebugInfo({
-            responseData: response.data,
-            endpoint: apiUrl,
-            userId: currentUser.user_id
-          });
+          console.error("API returned error:", data.message);
+          setError(data.message || 'Failed to fetch orders');
         }
       } catch (err) {
-        console.error('Error fetching orders:', err);
-        // Store detailed error information for debugging
+        console.error("Error fetching orders:", err);
+        setError('Failed to fetch your orders. Please try again later.');
         setDebugInfo({
           errorMessage: err.message,
-          errorResponse: err.response?.data,
-          errorStatus: err.response?.status,
-          endpoint: 'http://localhost/backend/jewerly_api/api/orders/read_by_user.php',
           userId: currentUser.user_id
         });
-        
-        setError('Failed to fetch your orders. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -169,15 +156,17 @@ const OrdersPage = () => {
         </div>
       )}
       
-      {/* Display user info for debugging */}
+      {/* Display order data for debugging */}
       <details className="mt-5">
-        <summary>User Information (for debugging)</summary>
+        <summary>Debug Order Data</summary>
         <pre className="mt-2" style={{ 
           backgroundColor: '#f8f9fa', 
           padding: '10px',
-          borderRadius: '5px' 
+          borderRadius: '5px',
+          maxHeight: '400px',
+          overflow: 'auto'
         }}>
-          {JSON.stringify(currentUser, null, 2)}
+          {JSON.stringify(orders, null, 2)}
         </pre>
       </details>
     </Container>

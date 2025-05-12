@@ -1,10 +1,11 @@
-import { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
+import { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Navbar, Nav, Container, NavDropdown, Badge, Form, Button, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faUser } from '@fortawesome/free-solid-svg-icons';
-import AuthContext, { useAuth } from '../contexts/Authcontext'; // Changed import
+import { faShoppingCart, faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import AuthContext, { useAuth } from '../contexts/Authcontext';
 import { CartContext } from '../contexts/Cartcontext';
+import { getCategories } from '../services/api';
 
 const NavbarComponent = () => {
   // Option 1: Use the useAuth hook (recommended)
@@ -15,10 +16,42 @@ const NavbarComponent = () => {
   
   const { cartItems } = useContext(CartContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        if (response.categories) {
+          setCategories(response.categories);
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      // Log the search term for debugging
+      console.log('Searching for:', searchTerm.trim());
+      
+      // Navigate to products page with search query
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      
+      // Clear the search field
+      setSearchTerm('');
+    }
   };
 
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -32,14 +65,37 @@ const NavbarComponent = () => {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <NavDropdown title="Collections" id="collections-dropdown">
-              <NavDropdown.Item as={Link} to="/products?category=1">Rings</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/products?category=2">Necklaces</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/products?category=3">Earrings</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/products?category=4">Bracelets</NavDropdown.Item>
+              {categories.map(category => (
+                <NavDropdown.Item 
+                  key={category._id} 
+                  as={Link} 
+                  to={`/products?category=${category._id}`}
+                >
+                  {category.name}
+                </NavDropdown.Item>
+              ))}
               <NavDropdown.Divider />
               <NavDropdown.Item as={Link} to="/products">All Jewelry</NavDropdown.Item>
             </NavDropdown>
           </Nav>
+          
+          <Form className="d-flex mx-auto my-2 my-lg-0" onSubmit={handleSearch}>
+            <InputGroup>
+              <Form.Control
+                type="search"
+                placeholder="Search jewelry..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search"
+                className="me-2"
+                style={{ maxWidth: '200px' }}
+              />
+              <Button variant="outline-light" type="submit">
+                <FontAwesomeIcon icon={faSearch} />
+              </Button>
+            </InputGroup>
+          </Form>
+          
           <Nav>
             <Nav.Link as={Link} to="/cart">
               <FontAwesomeIcon icon={faShoppingCart} />
@@ -50,7 +106,7 @@ const NavbarComponent = () => {
               )}
             </Nav.Link>
             {user ? (
-              <NavDropdown title={<><FontAwesomeIcon icon={faUser} /> {user.first_name}</>} id="user-dropdown" align="end">
+              <NavDropdown title={<><FontAwesomeIcon icon={faUser} /> {user.firstName || 'User'}</>} id="user-dropdown" align="end">
                 <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/orders">My Orders</NavDropdown.Item>
                 {user.role === 'admin' && (
