@@ -14,7 +14,7 @@ const adminApi = axios.create({
 // Add auth token to requests
 adminApi.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -29,7 +29,7 @@ adminApi.interceptors.request.use(
 export const adminLogin = async (email, password) => {
   try {
     console.log('Login attempt with:', { email, password });
-    const response = await adminApi.post('/admin/login', { email, password });
+    const response = await adminApi.post('/users/login', { email, password });
     console.log('Login response:', response.data);
     return response.data;
   } catch (error) {
@@ -53,7 +53,11 @@ export const getOrderStats = async () => {
 export const getOrders = async (params = {}) => {
   try {
     const response = await adminApi.get('/orders', { params });
-    return response.data;
+    // Transform response format to match component expectations
+    return {
+      success: response.data.success,
+      records: response.data.orders || []
+    };
   } catch (error) {
     console.error('Error fetching orders:', error);
     throw error;
@@ -63,7 +67,12 @@ export const getOrders = async (params = {}) => {
 export const getOrder = async (id) => {
   try {
     const response = await adminApi.get(`/orders/${id}`);
-    return response.data;
+    // Transform response format to match component expectations
+    return {
+      success: response.data.success,
+      order: response.data.order || null,
+      items: response.data.order?.items || []
+    };
   } catch (error) {
     console.error('Error fetching order:', error);
     throw error;
@@ -86,7 +95,11 @@ export const updateOrderStatus = async (orderId, status) => {
 export const getProducts = async (params = {}) => {
   try {
     const response = await adminApi.get('/products', { params });
-    return response.data;
+    // Transform response format to match component expectations
+    return {
+      success: response.data.success,
+      records: response.data.products || []
+    };
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error;
@@ -96,7 +109,10 @@ export const getProducts = async (params = {}) => {
 export const getProduct = async (productId) => {
   try {
     const response = await adminApi.get(`/products/${productId}`);
-    return response.data;
+    return {
+      success: response.data.success,
+      product: response.data.product || null
+    };
   } catch (error) {
     console.error('Error fetching product details:', error);
     throw error;
@@ -149,7 +165,17 @@ export const updateProductStock = async (productId, stock) => {
 export const getCategories = async () => {
   try {
     const response = await adminApi.get('/categories');
-    return response.data;
+    // Transform response format to match component expectations
+    return {
+      success: response.data.success,
+      records: response.data.categories.map(cat => ({
+        category_id: cat._id,
+        name: cat.name,
+        description: cat.description,
+        image: cat.image,
+        created: cat.createdAt
+      }))
+    };
   } catch (error) {
     console.error('Error fetching categories:', error);
     throw error;
@@ -158,8 +184,16 @@ export const getCategories = async () => {
 
 export const createCategory = async (categoryData) => {
   try {
-    const response = await adminApi.post('/categories', categoryData);
-    return response.data;
+    const response = await adminApi.post('/categories', {
+      name: categoryData.name,
+      description: categoryData.description,
+      image: categoryData.image
+    });
+    return {
+      success: response.data.success,
+      category: response.data.category,
+      message: 'Category created successfully'
+    };
   } catch (error) {
     console.error('Error creating category:', error);
     throw error;
@@ -168,8 +202,16 @@ export const createCategory = async (categoryData) => {
 
 export const updateCategory = async (categoryData) => {
   try {
-    const response = await adminApi.put(`/categories/${categoryData._id}`, categoryData);
-    return response.data;
+    const response = await adminApi.put(`/categories/${categoryData.category_id}`, {
+      name: categoryData.name,
+      description: categoryData.description,
+      image: categoryData.image
+    });
+    return {
+      success: response.data.success,
+      category: response.data.category,
+      message: 'Category updated successfully'
+    };
   } catch (error) {
     console.error('Error updating category:', error);
     throw error;
@@ -179,7 +221,10 @@ export const updateCategory = async (categoryData) => {
 export const deleteCategory = async (categoryId) => {
   try {
     const response = await adminApi.delete(`/categories/${categoryId}`);
-    return response.data;
+    return {
+      success: response.data.success,
+      message: response.data.message || 'Category deleted successfully'
+    };
   } catch (error) {
     console.error('Error deleting category:', error);
     throw error;
@@ -190,7 +235,21 @@ export const deleteCategory = async (categoryId) => {
 export const getUsers = async () => {
   try {
     const response = await adminApi.get('/admin/users');
-    return response.data;
+    console.log('Users API response:', response.data);
+    
+    // Transform response format to match component expectations
+    return {
+      success: response.data.success,
+      records: response.data.users.map(user => ({
+        user_id: user._id,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        created: user.createdAt,
+        order_count: user.orderCount || 0
+      }))
+    };
   } catch (error) {
     console.error('Error fetching users:', error);
     throw error;
@@ -200,7 +259,30 @@ export const getUsers = async () => {
 export const getUser = async (userId) => {
   try {
     const response = await adminApi.get(`/admin/users/${userId}`);
-    return response.data;
+    console.log('User details API response:', response.data);
+    
+    // Transform response format to match component expectations
+    const user = response.data.user;
+    
+    return {
+      success: response.data.success,
+      user: {
+        user_id: user._id,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        created: user.createdAt,
+        order_count: user.orderCount || 0,
+        orders: user.orders?.map(order => ({
+          _id: order._id,
+          total: order.total,
+          status: order.status,
+          createdAt: order.createdAt,
+          items: order.items
+        })) || []
+      }
+    };
   } catch (error) {
     console.error('Error fetching user details:', error);
     throw error;

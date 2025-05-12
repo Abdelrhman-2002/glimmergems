@@ -18,8 +18,8 @@ import OrderDetailPage from './pages/OrderDetailPage';
 // Import Admin Components
 import AdminLogin from './components/admin/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './components/admin/AdminDashboard';
-import ProductManagement from './components/admin/ProductManagement';
+import Dashboard from './components/admin/Dashboard';
+import ProductsAdmin from './components/admin/ProductsAdmin';
 import OrderManagement from './components/admin/OrderManagement';
 import CategoryManagement from './components/admin/CategoryManagement';
 import CustomerManagement from './components/admin/CustomerManagement';
@@ -61,12 +61,12 @@ function App() {
                   <AdminLayout />
                 </AdminProtectedRoute>
               }>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="products" element={<ProductManagement />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="products" element={<ProductsAdmin />} />
                 <Route path="categories" element={<CategoryManagement />} />
                 <Route path="orders" element={<OrderManagement />} />
                 <Route path="customers" element={<CustomerManagement />} />
-                <Route path="" element={<AdminDashboard />} />
+                <Route path="" element={<Dashboard />} />
               </Route>
             </Routes>
           </main>

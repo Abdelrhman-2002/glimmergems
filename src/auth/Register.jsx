@@ -8,6 +8,7 @@ const RegisterPage = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
     password: '',
     confirm_password: ''
   });
@@ -104,6 +105,20 @@ const RegisterPage = () => {
                     placeholder="Enter your email"
                     required
                   />
+                </Form.Group>
+                
+                <Form.Group className="mb-3" controlId="phone">
+                  <Form.Label>Phone Number</Form.Label>
+                  <Form.Control 
+                    type="tel" 
+                    name="phone"
+                    value={formData.phone} 
+                    onChange={handleChange}
+                    placeholder="Enter your phone number"
+                  />
+                  <Form.Text className="text-muted">
+                    Optional but recommended for order updates
+                  </Form.Text>
                 </Form.Group>
                 
                 <Form.Group className="mb-3" controlId="password">

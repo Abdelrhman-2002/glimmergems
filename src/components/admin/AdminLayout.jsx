@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Nav, Navbar, Button, Offcanvas, Image } from 'react-bootstrap';
+import { Container, Nav, Navbar, Button, Offcanvas, Image, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTachometerAlt,
@@ -13,6 +13,7 @@ import {
   faBars,
   faGem
 } from '@fortawesome/free-solid-svg-icons';
+import { AuthContext } from '../../contexts/Authcontext';
 
 // Admin Authentication Check Component
 export const AdminProtectedRoute = ({ children }) => {
@@ -23,11 +24,21 @@ export const AdminProtectedRoute = ({ children }) => {
   
   useEffect(() => {
     // Check if user is authenticated
-    const token = localStorage.getItem('admin_token');
-    const adminData = localStorage.getItem('admin_data');
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
     
-    if (token && adminData) {
-      setIsAuthenticated(true);
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        if (userData && userData.role === 'admin') {
+          setIsAuthenticated(true);
+        } else {
+          navigate('/admin/login', { state: { from: location } });
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        navigate('/admin/login', { state: { from: location } });
+      }
     } else {
       // Redirect to login page if not authenticated
       navigate('/admin/login', { state: { from: location } });
@@ -50,6 +61,7 @@ export const AdminProtectedRoute = ({ children }) => {
 
 // Admin Layout Component
 const AdminLayout = () => {
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
@@ -57,124 +69,103 @@ const AdminLayout = () => {
   
   useEffect(() => {
     // Get admin data from localStorage
-    const adminDataStr = localStorage.getItem('admin_data');
-    if (adminDataStr) {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
       try {
-        const parsedData = JSON.parse(adminDataStr);
+        const parsedData = JSON.parse(userStr);
         setAdminData(parsedData);
       } catch (error) {
-        console.error('Error parsing admin data:', error);
+        console.error('Error parsing user data:', error);
       }
     }
   }, []);
   
   const handleLogout = () => {
-    // Clear admin authentication data
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_data');
-    
-    // Redirect to login page
+    logout();
     navigate('/admin/login');
   };
   
   const closeSidebar = () => setShowSidebar(false);
   
+  // Check if a specific nav link is active
   const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    return location.pathname === path;
   };
   
   return (
-    <div className="admin-layout d-flex">
-      {/* Mobile Navbar */}
-      <Navbar bg="dark" variant="dark" expand={false} className="d-md-none">
-        <Container fluid>
-          <Navbar.Brand as={Link} to="/admin/dashboard">
-            <FontAwesomeIcon icon={faGem} className="me-2" />
-            Jewelry Admin
-          </Navbar.Brand>
-          <Navbar.Toggle 
-            aria-controls="sidebar-nav" 
-            onClick={() => setShowSidebar(true)}
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </Navbar.Toggle>
-        </Container>
-      </Navbar>
-      
-      {/* Sidebar for Mobile */}
-      <Offcanvas 
-        show={showSidebar} 
-        onHide={closeSidebar} 
-        placement="start" 
-        responsive="md"
-        className="sidebar bg-dark text-white"
-        id="sidebar-nav"
-      >
-        <Offcanvas.Header closeButton closeVariant="white">
-          <Offcanvas.Title className="text-white">
-            <FontAwesomeIcon icon={faGem} className="me-2" />
-            Jewelry Admin
-          </Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body className="p-0">
-          <SidebarContent 
-            adminData={adminData} 
-            handleLogout={handleLogout} 
-            isActive={isActive} 
-            closeSidebar={closeSidebar}
-          />
-        </Offcanvas.Body>
-      </Offcanvas>
-      
-      {/* Sidebar for Desktop */}
-      <div className="sidebar bg-dark text-white d-none d-md-flex" style={{ width: '250px', position: 'fixed', height: '100vh' }}>
-        <div className="d-flex flex-column w-100">
-          <div className="p-3 border-bottom border-secondary">
-            <h4 className="mb-0">
-              <FontAwesomeIcon icon={faGem} className="me-2" />
-              Jewelry Admin
-            </h4>
+    <Container fluid className="px-0">
+      <Row className="g-0">
+        {/* Sidebar */}
+        <Col md={3} lg={2} className="bg-dark text-white min-vh-100 py-4">
+          <div className="text-center mb-4">
+            <h3 className="fw-bold">Admin Panel</h3>
           </div>
-          <SidebarContent 
-            adminData={adminData} 
-            handleLogout={handleLogout} 
-            isActive={isActive}
-            closeSidebar={() => {}}
-          />
-        </div>
-      </div>
-      
-      {/* Main Content */}
-      <div className="content flex-grow-1" style={{ marginLeft: '0', paddingLeft: '0', paddingTop: '0', minHeight: '100vh' }}>
-        <div className="d-none d-md-block" style={{ marginLeft: '250px' }}>
-          <Navbar bg="white" className="shadow-sm py-2 px-4">
-            <div className="d-flex align-items-center">
-              <h5 className="mb-0">Welcome, {adminData?.first_name || 'Admin'}</h5>
-            </div>
-            <div className="ms-auto">
+          
+          <Nav className="flex-column">
+            <Nav.Link 
+              as={Link} 
+              to="/admin/dashboard" 
+              className={`mb-2 ps-4 ${isActive('/admin/dashboard') ? 'active bg-primary rounded' : 'text-white'}`}
+            >
+              <FontAwesomeIcon icon={faTachometerAlt} className="me-2" />
+              Dashboard
+            </Nav.Link>
+            
+            <Nav.Link 
+              as={Link} 
+              to="/admin/products" 
+              className={`mb-2 ps-4 ${isActive('/admin/products') ? 'active bg-primary rounded' : 'text-white'}`}
+            >
+              <FontAwesomeIcon icon={faBox} className="me-2" />
+              Products
+            </Nav.Link>
+            
+            <Nav.Link 
+              as={Link} 
+              to="/admin/categories" 
+              className={`mb-2 ps-4 ${isActive('/admin/categories') ? 'active bg-primary rounded' : 'text-white'}`}
+            >
+              <FontAwesomeIcon icon={faTags} className="me-2" />
+              Categories
+            </Nav.Link>
+            
+            <Nav.Link 
+              as={Link} 
+              to="/admin/orders" 
+              className={`mb-2 ps-4 ${isActive('/admin/orders') ? 'active bg-primary rounded' : 'text-white'}`}
+            >
+              <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
+              Orders
+            </Nav.Link>
+            
+            <Nav.Link 
+              as={Link} 
+              to="/admin/customers" 
+              className={`mb-2 ps-4 ${isActive('/admin/customers') ? 'active bg-primary rounded' : 'text-white'}`}
+            >
+              <FontAwesomeIcon icon={faUsers} className="me-2" />
+              Customers
+            </Nav.Link>
+            
+            <div className="mt-5 ps-4">
               <Button 
-                variant="outline-danger" 
-                size="sm"
+                variant="outline-light" 
+                className="w-100 d-flex align-items-center" 
                 onClick={handleLogout}
               >
                 <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
                 Logout
               </Button>
             </div>
-          </Navbar>
-          <div className="py-3 px-4">
-            <Outlet />
-          </div>
-        </div>
+          </Nav>
+        </Col>
         
-        {/* Content for mobile */}
-        <div className="d-block d-md-none">
-          <div className="py-3 px-4">
-            <Outlet />
-          </div>
-        </div>
-      </div>
-    </div>
+        {/* Main content */}
+        <Col md={9} lg={10} className="p-4">
+          <Outlet />
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

@@ -1,58 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faLock } from '@fortawesome/free-solid-svg-icons';
-import { adminLogin } from '../../services/adminApi';
+import { useState, useContext } from 'react';
+import { Container, Row, Col, Form, Button, Card, Alert } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import { AuthContext } from '../../contexts/Authcontext';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [loading, setLoading] = useState(false);
   
-  // Check if user is already logged in
-  useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    const adminData = localStorage.getItem('admin_data');
-    
-    if (token && adminData) {
-      // Redirect to admin dashboard or to the page they were trying to access
-      const redirectTo = location.state?.from?.pathname || '/admin/dashboard';
-      navigate(redirectTo);
-    }
-  }, [navigate, location]);
+  const { currentUser, login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
+  // Redirect if already logged in as admin
+  if (currentUser && currentUser.role === 'admin') {
+    navigate('/admin/dashboard');
+    return null;
+  }
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError('Please enter both email and password.');
       return;
     }
     
     try {
-      setLoading(true);
       setError('');
+      setLoading(true);
       
-      const response = await adminLogin(email, password);
+      const response = await axios.post('http://localhost:3001/api/users/login', {
+        email,
+        password
+      });
       
-      if (response.success) {
-        // Store token and admin data in localStorage
-        localStorage.setItem('admin_token', response.token);
-        localStorage.setItem('admin_data', JSON.stringify(response.admin));
+      if (response.data.success) {
+        const userData = response.data.user;
         
-        // Redirect to dashboard or to the page they were trying to access
-        const redirectTo = location.state?.from?.pathname || '/admin/dashboard';
-        navigate(redirectTo);
+        if (userData.role !== 'admin') {
+          setError('Access denied. You do not have admin privileges.');
+          setLoading(false);
+          return;
+        }
+        
+        // Store user data and token
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        // Navigate to admin dashboard
+        navigate('/admin/dashboard');
       } else {
-        setError(response.message || 'Login failed');
+        setError(response.data.message || 'Failed to log in.');
       }
     } catch (err) {
+      setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
       console.error('Login error:', err);
-      setError('Login failed. Please check your credentials and try again.');
     } finally {
       setLoading(false);
     }
@@ -62,50 +66,46 @@ const AdminLogin = () => {
     <Container className="py-5">
       <Row className="justify-content-center">
         <Col md={6} lg={5}>
-          <Card className="shadow">
-            <Card.Header className="bg-primary text-white text-center py-3">
-              <h4 className="mb-0">
-                <FontAwesomeIcon icon={faLock} className="me-2" />
-                Admin Login
-              </h4>
+          <Card>
+            <Card.Header className="bg-dark text-white">
+              <h4 className="mb-0">Admin Login</h4>
             </Card.Header>
-            <Card.Body className="p-4">
+            <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
               
               <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-3" controlId="adminEmail">
                   <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
+                  <Form.Control 
+                    type="email" 
+                    value={email} 
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your admin email"
                     required
                   />
                 </Form.Group>
                 
-                <Form.Group className="mb-4">
+                <Form.Group className="mb-4" controlId="adminPassword">
                   <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
+                  <Form.Control 
+                    type="password" 
+                    value={password} 
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
                     required
                   />
                 </Form.Group>
                 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100"
-                  disabled={loading}
-                >
-                  {loading ? 'Logging in...' : 'Login'}
-                  {!loading && <FontAwesomeIcon icon={faSignInAlt} className="ms-2" />}
+                <Button variant="dark" type="submit" className="w-100" disabled={loading}>
+                  {loading ? 'Logging in...' : 'Login as Admin'}
                 </Button>
               </Form>
             </Card.Body>
+            <Card.Footer className="text-center">
+              <p className="mb-0">
+                <Link to="/" className="text-decoration-none">Return to Store</Link>
+              </p>
+            </Card.Footer>
           </Card>
         </Col>
       </Row>

@@ -130,14 +130,25 @@ export const getDashboardStats = async (req, res) => {
 // @access  Private/Admin
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find({})
+    // Get all users
+    const users = await User.find({ role: 'customer' })
       .select('-password')
       .sort({ createdAt: -1 });
     
+    // Get order counts for each user
+    const usersWithOrders = await Promise.all(
+      users.map(async (user) => {
+        const orderCount = await Order.countDocuments({ user: user._id });
+        const userData = user.toObject();
+        userData.orderCount = orderCount;
+        return userData;
+      })
+    );
+    
     res.status(200).json({
       success: true,
-      count: users.length,
-      users
+      count: usersWithOrders.length,
+      users: usersWithOrders
     });
   } catch (error) {
     res.status(500).json({
@@ -156,9 +167,19 @@ export const getUserById = async (req, res) => {
     const user = await User.findById(req.params.id).select('-password');
     
     if (user) {
+      // Get user's orders
+      const orders = await Order.find({ user: user._id })
+        .sort({ createdAt: -1 })
+        .select('_id total status createdAt items');
+      
+      // Add orders to user data
+      const userData = user.toObject();
+      userData.orders = orders;
+      userData.orderCount = orders.length;
+      
       res.status(200).json({
         success: true,
-        user
+        user: userData
       });
     } else {
       res.status(404).json({
