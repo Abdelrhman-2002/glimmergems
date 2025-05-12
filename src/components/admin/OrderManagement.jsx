@@ -7,13 +7,30 @@ import { getOrders, getOrder, updateOrderStatus } from '../../services/adminApi'
 
 // Format price to show EGP currency
 const formatPrice = (price) => {
+  if (price === undefined || price === null || isNaN(parseFloat(price))) {
+    return '0.00 EGP';
+  }
   return `${parseFloat(price).toLocaleString('en-EG')} EGP`;
 };
 
 // Format date for better display
 const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return new Date(dateString).toLocaleDateString('en-US', options);
+  if (!dateString) {
+    return 'N/A';
+  }
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'N/A';
+    }
+    
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleDateString('en-US', options);
+  } catch (err) {
+    console.error('Date formatting error:', err);
+    return 'N/A';
+  }
 };
 
 const OrderManagement = () => {
@@ -37,16 +54,21 @@ const OrderManagement = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await getOrders();
+      console.log('Fetching orders...');
       
-      if (response.records) {
+      const response = await getOrders();
+      console.log('Orders response:', response);
+      
+      if (response.records && response.records.length > 0) {
+        console.log('Setting orders:', response.records);
         setOrders(response.records);
       } else {
+        console.warn('No orders found in response');
         setError('No orders found');
       }
     } catch (err) {
-      setError('Failed to load orders. Please try again.');
       console.error('Error fetching orders:', err);
+      setError('Failed to load orders. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -113,7 +135,7 @@ const OrderManagement = () => {
     
     // Search filter (by order ID or customer name if available)
     const matchesSearch = searchTerm === '' || 
-      order.order_id.toString().includes(searchTerm) || 
+      (order.order_id && order.order_id.toString().includes(searchTerm)) || 
       (order.customer_name && order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Date range filter
@@ -245,38 +267,32 @@ const OrderManagement = () => {
               {filteredOrders.length > 0 ? (
                 filteredOrders.map(order => (
                   <tr key={order.order_id}>
-                    <td>#{order.order_id}</td>
+                    <td>#{order.order_id.substring(0, 8)}</td>
                     <td>{formatDate(order.created)}</td>
-                    <td>
-                      {order.shipping_address ? (
-                        <span>
-                          {typeof order.shipping_address === 'string' 
-                            ? JSON.parse(order.shipping_address).first_name + ' ' + JSON.parse(order.shipping_address).last_name
-                            : order.shipping_address.first_name + ' ' + order.shipping_address.last_name
-                          }
-                        </span>
-                      ) : (
-                        order.customer_name || 'Guest'
-                      )}
-                    </td>
+                    <td>{order.customer_name || 'Guest'}</td>
                     <td>{formatPrice(order.total_amount)}</td>
                     <td>
                       <Badge bg={getStatusBadgeVariant(order.order_status)}>
-                        {order.order_status}
+                        {order.order_status || 'pending'}
                       </Badge>
                     </td>
                     <td>
-                      <Badge bg={order.payment_status === 'completed' ? 'success' : 'warning'}>
-                        {order.payment_status}
+                      <Badge bg={
+                        order.payment_status === 'completed' ? 'success' :
+                        order.payment_status === 'pending' ? 'warning' :
+                        order.payment_status === 'failed' ? 'danger' : 'secondary'
+                      }>
+                        {order.payment_status || 'pending'}
                       </Badge>
                     </td>
                     <td>
                       <Button
-                        variant="outline-primary"
+                        variant="primary"
                         size="sm"
                         onClick={() => handleViewOrder(order.order_id)}
                       >
-                        <FontAwesomeIcon icon={faEye} className="me-1" /> View
+                        <FontAwesomeIcon icon={faEye} className="me-1" />
+                        View
                       </Button>
                     </td>
                   </tr>

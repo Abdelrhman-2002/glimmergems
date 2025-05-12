@@ -53,10 +53,22 @@ export const getOrderStats = async () => {
 export const getOrders = async (params = {}) => {
   try {
     const response = await adminApi.get('/orders', { params });
+    console.log('Orders API response:', response.data);
+    
     // Transform response format to match component expectations
     return {
       success: response.data.success,
-      records: response.data.orders || []
+      records: response.data.orders.map(order => ({
+        order_id: order._id,
+        created: order.createdAt,
+        customer_name: order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Guest',
+        customer_email: order.user?.email,
+        total_amount: order.total,
+        order_status: order.status,
+        payment_status: order.paymentInfo?.status,
+        payment_method: order.paymentInfo?.method,
+        items: order.items
+      }))
     };
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -67,11 +79,42 @@ export const getOrders = async (params = {}) => {
 export const getOrder = async (id) => {
   try {
     const response = await adminApi.get(`/orders/${id}`);
+    console.log('Order details API response:', response.data);
+    
     // Transform response format to match component expectations
+    const order = response.data.order;
+    if (!order) {
+      return {
+        success: false,
+        message: 'Order not found'
+      };
+    }
+    
     return {
       success: response.data.success,
-      order: response.data.order || null,
-      items: response.data.order?.items || []
+      order: {
+        order_id: order._id,
+        created: order.createdAt,
+        customer_name: order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Guest',
+        customer_email: order.user?.email,
+        total_amount: order.total,
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        order_status: order.status,
+        payment_status: order.paymentInfo?.status,
+        payment_method: order.paymentInfo?.method,
+        shipping_address: order.shippingAddress,
+        notes: order.notes
+      },
+      items: order.items.map(item => ({
+        product_id: item.product?._id || item.product,
+        product_name: item.product?.name || 'Product',
+        quantity: item.quantity,
+        price: item.price,
+        total: item.quantity * item.price,
+        image: item.product?.images?.[0] || ''
+      }))
     };
   } catch (error) {
     console.error('Error fetching order:', error);
