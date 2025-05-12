@@ -63,19 +63,31 @@ const ProductManagement = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentProduct({
-      ...currentProduct,
-      [name]: value
-    });
+    
+    // Special handling for category_id to ensure consistent format
+    if (name === 'category_id') {
+      setCurrentProduct({
+        ...currentProduct,
+        category_id: value // Store as is (string from select)
+      });
+    } else {
+      setCurrentProduct({
+        ...currentProduct,
+        [name]: value
+      });
+    }
   };
   
   // Add new product
   const handleAddProduct = () => {
+    // Default to first category if available, otherwise empty string
+    const defaultCategoryId = categories.length > 0 ? categories[0].category_id : '';
+    
     setCurrentProduct({
       name: '',
       description: '',
       price: '',
-      category_id: categories.length > 0 ? categories[0].category_id : '',
+      category_id: defaultCategoryId,
       stock: '10',
       image_url: '',
       material: '',
@@ -137,6 +149,7 @@ const ProductManagement = () => {
         ...currentProduct,
         price: parseFloat(currentProduct.price),
         stock: parseInt(currentProduct.stock),
+        category_id: currentProduct.category_id,
         weight: currentProduct.weight ? parseFloat(currentProduct.weight) : null
       };
       
@@ -175,14 +188,15 @@ const ProductManagement = () => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) ||
                           product.description.toLowerCase().includes(search.toLowerCase());
     
-    const matchesFilter = filter === 'all' || product.category_id === parseInt(filter);
+    const matchesFilter = filter === 'all' || String(product.category_id) === String(filter);
     
     return matchesSearch && matchesFilter;
   });
   
   // Get category name by ID
   const getCategoryName = (categoryId) => {
-    const category = categories.find(cat => cat.category_id === categoryId);
+    const categoryIdStr = String(categoryId);
+    const category = categories.find(cat => String(cat.category_id) === categoryIdStr);
     return category ? category.name : 'Uncategorized';
   };
   
@@ -224,7 +238,7 @@ const ProductManagement = () => {
               >
                 <option value="all">All Categories</option>
                 {categories.map(category => (
-                  <option key={category.category_id} value={category.category_id}>
+                  <option key={category.category_id} value={String(category.category_id)}>
                     {category.name}
                   </option>
                 ))}
@@ -347,13 +361,13 @@ const ProductManagement = () => {
                   <Form.Label>Category <span className="text-danger">*</span></Form.Label>
                   <Form.Select
                     name="category_id"
-                    value={currentProduct.category_id}
+                    value={String(currentProduct.category_id)}
                     onChange={handleInputChange}
                     required
                   >
                     <option value="">Select Category</option>
                     {categories.map(category => (
-                      <option key={category.category_id} value={category.category_id}>
+                      <option key={category.category_id} value={String(category.category_id)}>
                         {category.name}
                       </option>
                     ))}
