@@ -9,7 +9,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 export default {
   port: process.env.PORT || 3001,
-  mongoURI: process.env.MONGODB_URI || 'mongodb://localhost:27017/jewelry_store',
+  mongoURI: process.env.MONGODB_URI || 'mongodb+srv://bodyegypt2016:Abdelrhman_17122002@cluster0.39kmx.mongodb.net/jewelry_store',
   jwtSecret: process.env.JWT_SECRET || 'your_jwt_secret_key_change_this_in_production',
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || 'your_stripe_secret_key'
 }; 
