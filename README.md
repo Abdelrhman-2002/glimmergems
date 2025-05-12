@@ -1,118 +1,102 @@
-# Jewelry Store
+# GlimmerGems Jewelry Store
 
-A full-stack e-commerce platform for a jewelry store built with the MERN stack (MongoDB, Express.js, React, Node.js).
+A modern e-commerce platform for a jewelry store built with React.js, Node.js, Express, and MongoDB.
 
 ## Features
 
-- Responsive design with Bootstrap
-- User authentication and authorization
-- Product catalog and search
-- Shopping cart and checkout
-- Payment processing with Stripe
-- Admin dashboard for store management
-- Order tracking and history
+- User authentication and account management
+- Product browsing with search and filtering
+- Shopping cart functionality
+- Secure checkout process
+- Responsive design for all devices
+- Admin dashboard for inventory management
 
-## Technology Stack
+## Tech Stack
 
 ### Frontend
 - React.js
-- React Router for navigation
-- Bootstrap for UI components
-- FontAwesome icons
+- React Router
+- React Bootstrap
+- Context API for state management
 - Axios for API requests
-- Chart.js for analytics
-- Stripe for payment processing
 
 ### Backend
 - Node.js
 - Express.js
 - MongoDB with Mongoose
-- JWT Authentication
-- Bcrypt for password hashing
-- Stripe API integration
+- JWT for authentication
 
-## Getting Started
+## Installation
 
 ### Prerequisites
 - Node.js (v14 or higher)
-- MongoDB (local instance or MongoDB Atlas)
-- Stripe account for payment processing
+- MongoDB
+- Git
 
-### Installation
+### Setup and Running
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/jewerly-store.git
-   cd jewerly-store
-   ```
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/glimmergems.git
+cd glimmergems
+```
 
-2. Install frontend dependencies:
-   ```
-   npm install
-   ```
+2. Install dependencies for both frontend and backend
+```bash
+# Install backend dependencies
+cd backend
+npm install
 
-3. Install backend dependencies:
-   ```
-   cd backend
-   npm install
-   ```
+# Install frontend dependencies
+cd ..
+npm install
+```
 
-4. Create a `.env` file in the backend directory with the following variables:
-   ```
-   PORT=3001
-   MONGODB_URI=mongodb://localhost:27017/jewelry_store
-   JWT_SECRET=your_jwt_secret_key_change_this_in_production
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   ```
+3. Set up environment variables
+Create a `.env` file in the backend directory with the following variables:
+```
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+PORT=3001
+```
 
-5. Run both frontend and backend concurrently:
-   ```
-   # From the root directory
-   npm run dev:all
-   ```
+4. Run the application
+```bash
+# Run backend (from the backend directory)
+npm run start
 
-   Or run them separately:
-   ```
-   # For frontend (from root directory)
-   npm run dev
-   
-   # For backend (from root directory)
-   npm run server
-   ```
+# Run frontend (from the root directory)
+npm run dev
+```
+
+5. Access the application
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001/api
 
 ## Project Structure
 
 ```
 jewerly-store/
-├── backend/               # Node.js backend
-│   ├── src/              
-│   │   ├── config/        # Configuration files
-│   │   ├── controllers/   # Route controllers
-│   │   ├── middleware/    # Middleware functions
-│   │   ├── models/        # Mongoose models
-│   │   ├── routes/        # API routes
-│   │   └── server.js      # Server entry point
-│   ├── .env               # Environment variables
-│   └── package.json       # Backend dependencies
-├── public/                # Static files
-├── src/                   # React frontend
-│   ├── assets/            # Images and static assets
-│   ├── components/        # Reusable components
-│   ├── contexts/          # React contexts
-│   ├── layouts/           # Page layouts
-│   ├── pages/             # Page components
-│   ├── routes/            # Routes configuration
-│   ├── services/          # API services
-│   └── utils/             # Utility functions
-├── .gitignore             # Git ignore file
-├── package.json           # Frontend dependencies
-└── README.md              # Project documentation
+├── backend/                 # Backend Node.js application
+│   ├── src/
+│   │   ├── controllers/     # Route controllers
+│   │   ├── models/          # Mongoose models
+│   │   ├── routes/          # API routes
+│   │   ├── middleware/      # Custom middleware
+│   │   └── server.js        # Server entry point
+│   └── package.json
+├── src/                     # Frontend React application
+│   ├── components/          # Reusable components
+│   ├── contexts/            # React context providers
+│   ├── pages/               # Page components
+│   ├── layouts/             # Layout components
+│   ├── services/            # API services
+│   ├── auth/                # Authentication components
+│   ├── App.jsx              # Main app component
+│   └── main.jsx             # Entry point
+└── package.json
 ```
 
-## Contributing
+## License
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+MIT License

@@ -1,29 +1,12 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
 
-# Build output
-node_modules
-dist
-dist-ssr
-*.local
-build
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Build files
+/build
+/dist
+*.tsbuildinfo
 
 # Environment variables
 .env
@@ -32,19 +15,25 @@ build
 .env.test.local
 .env.production.local
 
-# PHP related (remove these since we're using Node.js)
-vendor/
-composer.lock
-*.php
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
 
-# MongoDB
-*.mongodb
-mongodb-data/
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
 
 # Testing
-coverage/
+/coverage
+
+# Production
+/build
 
 # Misc
 .DS_Store
-.directory
-Thumbs.db
